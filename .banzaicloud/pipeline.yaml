@@ -112,7 +112,7 @@ pipeline:
                 enabled: true
           image:
             pullPolicy: Always
-            repository: '{{ .CICD_REPO }}'
+            repository: 'orymate2/modern-go-application-instance'
             tag: '{{ trunc 7 .CICD_COMMIT_SHA }}'
           ingress:
             annotations:
