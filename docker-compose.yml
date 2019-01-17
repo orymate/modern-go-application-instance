@@ -1,0 +1,17 @@
+version: "3.1"
+
+services:
+    db:
+        image: mysql:8.0
+        command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+        environment:
+            MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+            MYSQL_DATABASE: app
+
+    redis:
+        image: redis:4.0
+
+    jaeger:
+        image: jaegertracing/all-in-one:latest
+        environment:
+            COLLECTOR_ZIPKIN_HTTP_PORT: 9411

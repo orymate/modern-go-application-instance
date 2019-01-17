@@ -1,0 +1,43 @@
+language: go
+
+dist: xenial
+
+services:
+    - docker
+
+go:
+    - 1.11.x
+    - tip
+
+branches:
+    only:
+        - master
+        - /^v?\d+\.\d+\.\d+(-\S*)?$/
+
+matrix:
+    fast_finish: true
+    allow_failures:
+        - go: tip
+
+before_script:
+    - make vendor
+    - export VERSION=${TRAVIS_TAG:-$TRAVIS_BRANCH}
+    - export $(make varexport-DOCKER_IMAGE)
+
+script:
+    - make test
+    - make test-integration
+    - make lint
+    - if [[ $VERSION = "master" ]]; then export DOCKER_LATEST=1; fi
+    - make docker
+    - make docker-debug
+
+#before_deploy: docker login -u $DOCKER_USER -p $DOCKER_PASS
+#
+#deploy:
+#    provider: script
+#    skip_cleanup: true
+#    script: docker push $DOCKER_IMAGE
+#    on:
+#        all_branches: true
+#        condition: $TRAVIS_GO_VERSION =~ ^1\.11(\.(x|[0-9]+))?$

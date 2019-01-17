@@ -1,0 +1,115 @@
+image: golang:1.11.4
+
+variables:
+    PROJECT_NAME: github.com/sagikazarmark/modern-go-application
+    DOCKER_IMAGE: registry.gitlab.com/${CI_PROJECT_PATH}
+
+stages:
+    - dependencies
+    - test
+    - build
+    - packaging
+
+before_script:
+    # Create a symbolic link under $GOPATH
+    - cd $GOPATH/src
+    - mkdir -p $(dirname $PROJECT_NAME)
+    - ln -s $CI_PROJECT_DIR $PROJECT_NAME
+    - cd $PROJECT_NAME
+    - pwd
+
+cache:
+    key: vendor
+    paths:
+        - vendor/
+
+dependencies:
+    stage: dependencies
+    script:
+        - make vendor
+
+test:
+    stage: test
+    script:
+        - make test
+    artifacts:
+        reports:
+            junit: build/test_results/main/results.xml
+
+test-integration:
+    stage: test
+    script:
+        - make test-integration
+    artifacts:
+        reports:
+            junit: build/test_results/integration/results.xml
+
+lint:
+    stage: test
+    script:
+        - make lint
+
+.build: &build_definition
+    stage: build
+    script:
+        - export CI_BUILD_DATE=$(date +%FT%T%z)
+        - make build-release VERSION=${CI_COMMIT_REF_NAME} COMMIT_HASH=${CI_COMMIT_SHA} BUILD_DATE=${CI_BUILD_DATE}
+        - make build-debug VERSION=${CI_COMMIT_REF_NAME} COMMIT_HASH=${CI_COMMIT_SHA} BUILD_DATE=${CI_BUILD_DATE}
+
+snapshot:
+    <<: *build_definition
+    only:
+        - master
+    artifacts:
+        paths:
+            - build/
+        expire_in: 2 days
+
+release:
+    <<: *build_definition
+    only:
+        - tags
+    artifacts:
+        paths:
+            - build/
+
+.docker: &docker_definition
+    stage: packaging
+    image: docker:stable
+    variables:
+        DOCKER_HOST: tcp://docker:2375/
+        DOCKER_DRIVER: overlay2
+    services:
+        - docker:dind
+    before_script:
+        - docker info
+        - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+        - apk add --update --no-cache ca-certificates make
+    script:
+        - docker build --build-arg BUILD_DIR=build --build-arg BINARY_NAME=$(make var-BINARY_NAME) -t ${DOCKER_IMAGE}:${CI_COMMIT_REF_NAME} -f Dockerfile.local .
+        - docker build --build-arg BUILD_DIR=build --build-arg BINARY_NAME=$(make var-BINARY_NAME)-debug -t ${DOCKER_IMAGE}:${CI_COMMIT_REF_NAME}-debug -f Dockerfile.debug .
+        - docker push ${DOCKER_IMAGE}:${CI_COMMIT_REF_NAME}
+        - docker push ${DOCKER_IMAGE}:${CI_COMMIT_REF_NAME}-debug
+
+docker:snapshot:
+    <<: *docker_definition
+    dependencies:
+        - snapshot
+    only:
+        - master
+
+docker:release:
+    <<: *docker_definition
+    dependencies:
+        - release
+    only:
+        - tags
+    script:
+        - docker build --build-arg BUILD_DIR=build --build-arg BINARY_NAME=$(make var-BINARY_NAME) -t ${DOCKER_IMAGE}:${CI_COMMIT_REF_NAME} -f Dockerfile.local .
+        - docker build --build-arg BUILD_DIR=build --build-arg BINARY_NAME=$(make var-BINARY_NAME)-debug -t ${DOCKER_IMAGE}:${CI_COMMIT_REF_NAME}-debug -f Dockerfile.debug .
+        - docker push ${DOCKER_IMAGE}:${CI_COMMIT_REF_NAME}
+        - docker push ${DOCKER_IMAGE}:${CI_COMMIT_REF_NAME}-debug
+        - docker tag ${DOCKER_IMAGE}:${CI_COMMIT_REF_NAME} ${DOCKER_IMAGE}:latest
+        - docker tag ${DOCKER_IMAGE}:${CI_COMMIT_REF_NAME}-debug ${DOCKER_IMAGE}:latest-debug
+        - docker push ${DOCKER_IMAGE}:latest
+        - docker push ${DOCKER_IMAGE}:latest-debug

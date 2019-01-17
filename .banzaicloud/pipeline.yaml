@@ -1,0 +1,140 @@
+workspace:
+  base: /cicd
+  path: src/github.com/sagikazarmark/modern-go-application
+pipeline:
+  create_cluster:
+    image: banzaicloud/ci-pipeline-client:0.10
+    cluster:
+      name: orymatefcaz
+      location: us-central1-a
+      cloud: google
+      secretId: 24ce17a68057653de602fb53f78a7c43725ebc3065df0f0d82a8ea93992db667
+      secretName: ""
+      profileName: ""
+      postHooks:
+        InstallLogging:
+          bucketName: bukkett
+          secretId: 24ce17a68057653de602fb53f78a7c43725ebc3065df0f0d82a8ea93992db667
+        InstallMonitoring:
+          enabled: true
+      properties:
+        gke:
+          nodeVersion: "1.10"
+          nodePools:
+            pool1:
+              autoscaling: true
+              minCount: 1
+              maxCount: 2
+              count: 1
+              instanceType: n1-standard-2
+              preemptible: true
+            system:
+              autoscaling: true
+              minCount: 1
+              maxCount: 2
+              count: 1
+              instanceType: n1-standard-2
+          master:
+            version: "1.10"
+          projectId: mate-teszt
+    action: EnsureCluster
+  build:
+    image: golang:1.11
+    commands: make vendor check
+    environment:
+      GOPATH: /cicd
+  build_image:
+    dockerfile: Dockerfile
+    image: plugins/docker
+    repo: '{{ .CICD_REPO }}'
+    secretFrom:
+      DOCKER_PASSWORD:
+        keyRef: password
+        name: docker-hub
+      DOCKER_USERNAME:
+        keyRef: username
+        name: docker-hub
+    tags: '{{ trunc 7 .CICD_COMMIT_SHA }}'
+  package_application:
+    when:
+      branch:
+        include:
+        - master
+    image: lachlanevenson/k8s-helm:latest
+    commands:
+    - helm init -c
+    - helm repo add banzaicloud-stable http://kubernetes-charts.banzaicloud.com/branch/master
+    - helm package ./.banzaicloud/charts/spotguide-modern-go-application
+  install_mysql_user_credentials_secret:
+    action: InstallSecret
+    clusterSecret:
+      merge: true
+      name: '{{ .CICD_REPO_NAME }}-mysql'
+      namespace: default
+      sourceSecretName: modern-go-application-instance-mysql-user-credentials
+      spec:
+      - name: mysql-username
+        source: username
+      - name: mysql-password
+        source: password
+    image: banzaicloud/ci-pipeline-client:0.10
+    when:
+      branch:
+        include:
+        - master
+  install_mysql_root_password_secret:
+    action: InstallSecret
+    clusterSecret:
+      merge: true
+      name: '{{ .CICD_REPO_NAME }}-mysql-root-password'
+      namespace: default
+      sourceSecretName: modern-go-application-instance-mysql-root-password
+      spec:
+      - name: mysql-root-password
+        source: password
+    image: banzaicloud/ci-pipeline-client:0.10
+    when:
+      branch:
+        include:
+        - master
+  deploy_application:
+    action: EnsureDeployment
+    deployment:
+      name: ./spotguide-modern-go-application-0.1.0.tgz
+      releaseName: '{{ .CICD_REPO_NAME }}'
+      reuseValues: true
+      timeout: 900
+      values:
+        application:
+          config:
+            instrumentation:
+              prometheus:
+                enabled: true
+          image:
+            pullPolicy: Always
+            repository: '{{ .CICD_REPO }}'
+            tag: '{{ trunc 7 .CICD_COMMIT_SHA }}'
+          ingress:
+            annotations:
+              kubernetes.io/ingress.class: traefik
+              traefik.ingress.kubernetes.io/redirect-permanent: "true"
+              traefik.ingress.kubernetes.io/redirect-regex: ^http://(.*)
+              traefik.ingress.kubernetes.io/redirect-replacement: https://$1
+            enabled: true
+            hosts:
+            - app-{{ .CICD_REPO_NAME }}.{{ .CLUSTER_NAME }}.{{ .ORG_NAME }}.{{ .DOMAIN_NAME }}
+        mysql:
+          database: app
+          enabled: true
+          existingSecret: '{{ .CICD_REPO_NAME }}-mysql-root-password'
+          existingUserSecret: '{{ .CICD_REPO_NAME }}-mysql'
+          metrics:
+            enabled: true
+          port: null
+        nameOverride: '{{ .CICD_REPO_NAME }}'
+      wait: true
+    image: banzaicloud/ci-pipeline-client:0.10
+    when:
+      branch:
+        include:
+        - master
