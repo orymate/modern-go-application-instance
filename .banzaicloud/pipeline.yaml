@@ -46,7 +46,7 @@ pipeline:
   build_image:
     dockerfile: Dockerfile
     image: plugins/docker
-    repo: '{{ .CICD_REPO }}'
+    repo: 'orymate2/modern-go-application-instance'
     secretFrom:
       DOCKER_PASSWORD:
         keyRef: password
