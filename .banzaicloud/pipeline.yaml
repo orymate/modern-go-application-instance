@@ -92,6 +92,8 @@ pipeline:
       spec:
       - name: mysql-root-password
         source: password
+      - name: mysql-password
+        source: password
     image: banzaicloud/ci-pipeline-client:0.10
     when:
       branch:
