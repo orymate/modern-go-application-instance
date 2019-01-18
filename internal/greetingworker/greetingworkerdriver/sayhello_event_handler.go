@@ -6,7 +6,7 @@ import (
 
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/pkg/errors"
-	"github.com/sagikazarmark/modern-go-application/internal/greetingworker"
+	"github.com/orymate/modern-go-application-instance/internal/greetingworker"
 )
 
 // SayHelloEventSubscriber subscribes to hello world events.

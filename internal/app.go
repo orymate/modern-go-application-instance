@@ -7,13 +7,13 @@ import (
 	"github.com/goph/emperror"
 	"github.com/goph/logur"
 	"github.com/gorilla/mux"
-	"github.com/sagikazarmark/modern-go-application/internal/greeting"
-	"github.com/sagikazarmark/modern-go-application/internal/greeting/greetingadapter"
-	"github.com/sagikazarmark/modern-go-application/internal/greeting/greetingdriver"
-	"github.com/sagikazarmark/modern-go-application/internal/greetingworker"
-	"github.com/sagikazarmark/modern-go-application/internal/greetingworker/greetingworkeradapter"
-	"github.com/sagikazarmark/modern-go-application/internal/greetingworker/greetingworkerdriver"
-	"github.com/sagikazarmark/modern-go-application/internal/httpbin"
+	"github.com/orymate/modern-go-application-instance/internal/greeting"
+	"github.com/orymate/modern-go-application-instance/internal/greeting/greetingadapter"
+	"github.com/orymate/modern-go-application-instance/internal/greeting/greetingdriver"
+	"github.com/orymate/modern-go-application-instance/internal/greetingworker"
+	"github.com/orymate/modern-go-application-instance/internal/greetingworker/greetingworkeradapter"
+	"github.com/orymate/modern-go-application-instance/internal/greetingworker/greetingworkerdriver"
+	"github.com/orymate/modern-go-application-instance/internal/httpbin"
 )
 
 // NewApp returns a new HTTP application.

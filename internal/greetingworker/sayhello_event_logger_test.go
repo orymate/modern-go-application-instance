@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/goph/logur"
-	. "github.com/sagikazarmark/modern-go-application/internal/greetingworker"
-	"github.com/sagikazarmark/modern-go-application/internal/greetingworker/greetingworkeradapter"
+	. "github.com/orymate/modern-go-application-instance/internal/greetingworker"
+	"github.com/orymate/modern-go-application-instance/internal/greetingworker/greetingworkeradapter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

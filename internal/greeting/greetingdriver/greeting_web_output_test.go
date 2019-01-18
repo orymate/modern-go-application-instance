@@ -10,7 +10,7 @@ import (
 
 	"github.com/goph/emperror"
 	"github.com/pkg/errors"
-	"github.com/sagikazarmark/modern-go-application/internal/greeting"
+	"github.com/orymate/modern-go-application-instance/internal/greeting"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

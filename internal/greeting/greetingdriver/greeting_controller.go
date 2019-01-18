@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/goph/emperror"
-	"github.com/sagikazarmark/modern-go-application/.gen/openapi/go"
-	"github.com/sagikazarmark/modern-go-application/internal/greeting"
+	"github.com/orymate/modern-go-application-instance/.gen/openapi/go"
+	"github.com/orymate/modern-go-application-instance/internal/greeting"
 )
 
 type HelloWorld interface {

@@ -34,7 +34,7 @@ const template = `
         <h1>It works!</h1>
     </div>
     <div class="container">
-        <p>You successfully deployed <a href="https://github.com/sagikazarmark/modern-go-application">Modern Go Application!</a></p>
+        <p>You successfully deployed <a href="https://github.com/orymate/modern-go-application-instance">Modern Go Application!</a></p>
     </div>
 </body>
 </html>

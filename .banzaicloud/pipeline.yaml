@@ -1,6 +1,5 @@
 workspace:
   base: /cicd
-  path: src/github.com/sagikazarmark/modern-go-application
 pipeline:
   create_cluster:
     image: banzaicloud/ci-pipeline-client:0.10

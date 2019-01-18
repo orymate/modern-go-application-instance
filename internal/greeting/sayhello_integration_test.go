@@ -8,10 +8,10 @@ import (
 	"testing"
 
 	"github.com/goph/emperror"
-	"github.com/sagikazarmark/modern-go-application/.gen/openapi/go"
-	"github.com/sagikazarmark/modern-go-application/internal/greeting"
-	"github.com/sagikazarmark/modern-go-application/internal/greeting/greetingadapter"
-	"github.com/sagikazarmark/modern-go-application/internal/greeting/greetingdriver"
+	"github.com/orymate/modern-go-application-instance/.gen/openapi/go"
+	"github.com/orymate/modern-go-application-instance/internal/greeting"
+	"github.com/orymate/modern-go-application-instance/internal/greeting/greetingadapter"
+	"github.com/orymate/modern-go-application-instance/internal/greeting/greetingdriver"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

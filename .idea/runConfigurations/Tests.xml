@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Tests" type="GoTestRunConfiguration" factoryName="Go Test">
-    <module name="project" />
+    <module name="modern-go-application-instance" />
     <working_directory value="$PROJECT_DIR$/" />
     <framework value="gotest" />
     <kind value="DIRECTORY" />

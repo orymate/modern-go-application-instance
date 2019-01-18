@@ -4,7 +4,7 @@ FROM golang:${GO_VERSION}-alpine AS builder
 
 RUN apk add --update --no-cache ca-certificates make git curl mercurial
 
-ARG PACKAGE=github.com/sagikazarmark/modern-go-application
+ARG PACKAGE=github.com/orymate/modern-go-application-instance
 
 RUN mkdir -p /go/src/${PACKAGE}
 WORKDIR /go/src/${PACKAGE}

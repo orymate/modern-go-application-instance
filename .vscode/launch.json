@@ -9,7 +9,7 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceRoot}/cmd/modern-go-application/",
+            "program": "${workspaceRoot}/cmd/modern-go-application-instance/",
             "env": {
                 "APP_CONFIG_DIR": "${workspaceRoot}",
             },
@@ -22,7 +22,7 @@
             "remotePath": "/",
             "port": 40000,
             "host": "127.0.0.1",
-            "program": "${workspaceRoot}/cmd/modern-go-application/",
+            "program": "${workspaceRoot}/cmd/modern-go-application-instance/",
         }
     ]
 }

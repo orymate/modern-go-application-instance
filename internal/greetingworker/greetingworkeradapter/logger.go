@@ -2,7 +2,7 @@ package greetingworkeradapter
 
 import (
 	"github.com/goph/logur"
-	"github.com/sagikazarmark/modern-go-application/internal/greetingworker"
+	"github.com/orymate/modern-go-application-instance/internal/greetingworker"
 )
 
 // Logger wraps a logur logger and exposes it under a custom interface.
